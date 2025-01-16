@@ -1,5 +1,6 @@
 package com.example.zlv.controller;
 
+import com.example.zlv.service.TestService;
 import com.example.zlv.vo.FileResp;
 import com.example.zlv.vo.ResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,9 +16,15 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "test参数")
 public class TestController {
 
+
+    @Autowired
+    private TestService testService;
+
     @GetMapping("/ok")
     @Operation(summary = "普通test请求")
-    public String test() {
+    public String test() throws InterruptedException {
+        testService.testAsync();
+        testService.tesStAsync();
         return "OK";
     }
 
@@ -40,4 +48,6 @@ public class TestController {
         fileResp.setName(name1);
         return ResponseEntity.ok(fileResp);
     }
+
+
 }

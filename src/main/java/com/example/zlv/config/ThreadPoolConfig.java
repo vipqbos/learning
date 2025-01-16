@@ -24,7 +24,9 @@ public class ThreadPoolConfig {
 
     @Bean
     public ThreadPoolExecutor threadPoolExecutor() {
-        return new ThreadPoolExecutor(threadCoreSize,threadMaxSize,keepActiveTime, TimeUnit.SECONDS,new ArrayBlockingQueue<>(threadCapacitySize));
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(threadCoreSize, threadMaxSize, keepActiveTime, TimeUnit.SECONDS, new ArrayBlockingQueue<>(threadCapacitySize));
+        threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+        return threadPoolExecutor;
     }
 
 
@@ -34,6 +36,7 @@ public class ThreadPoolConfig {
         threadPoolTaskExecutor.setCorePoolSize(threadCoreSize);
         threadPoolTaskExecutor.setMaxPoolSize(threadMaxSize);
         threadPoolTaskExecutor.setQueueCapacity(threadCapacitySize);
+        threadPoolTaskExecutor.setThreadNamePrefix("s_thread");
         threadPoolTaskExecutor.setKeepAliveSeconds(Long.valueOf(keepActiveTime).intValue());
         return threadPoolTaskExecutor;
     }
