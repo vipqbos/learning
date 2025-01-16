@@ -22,7 +22,7 @@ public class ThreadPoolConfig {
     private long keepActiveTime;
 
 
-    @Bean
+    @Bean(name = "threadPoolExecutor")
     public ThreadPoolExecutor threadPoolExecutor() {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(threadCoreSize, threadMaxSize, keepActiveTime, TimeUnit.SECONDS, new ArrayBlockingQueue<>(threadCapacitySize));
         threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
@@ -30,7 +30,7 @@ public class ThreadPoolConfig {
     }
 
 
-    @Bean
+    @Bean(name = "threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
         threadPoolTaskExecutor.setCorePoolSize(threadCoreSize);
