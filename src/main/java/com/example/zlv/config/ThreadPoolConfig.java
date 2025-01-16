@@ -3,16 +3,16 @@ package com.example.zlv.config;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Configurable
-@EnableAsync
-public class ThreadPoolConfig {
+public class ThreadPoolConfig implements AsyncConfigurer {
 
     @Value("${thread.core.size:20}")
     private int threadCoreSize;
@@ -23,6 +23,10 @@ public class ThreadPoolConfig {
     @Value("${thread.queue.size:50}")
     private long keepActiveTime;
 
+    @Override
+    public Executor getAsyncExecutor() {
+        return testThreadPoolTaskExecutor() ;
+    }
 
     @Bean(name = "testPoolExecutor")
     public ThreadPoolExecutor testPoolExecutor() {
@@ -40,6 +44,7 @@ public class ThreadPoolConfig {
         threadPoolTaskExecutor.setQueueCapacity(threadCapacitySize);
         threadPoolTaskExecutor.setThreadNamePrefix("s_thread");
         threadPoolTaskExecutor.setKeepAliveSeconds(Long.valueOf(keepActiveTime).intValue());
+        threadPoolTaskExecutor.initialize();
         return threadPoolTaskExecutor;
     }
 }

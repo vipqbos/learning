@@ -8,8 +8,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,14 +15,16 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "test参数")
 public class TestController {
 
+    private final TestService testService;
 
-    @Autowired
-    private TestService testService;
+    public  TestController(TestService testService){
+        this.testService = testService;
+    }
+
 
     @GetMapping("/ok")
     @Operation(summary = "普通test请求")
     public String test() throws InterruptedException {
-        testService.testAsync();
         testService.tesStAsync();
         return "OK";
     }

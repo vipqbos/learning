@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 public class TestService {
 
 
-    @Async("testPoolExecutor")
+    @Async
     public void testAsync() throws InterruptedException {
         Thread.sleep(1000);
     }
 
-    @Async("testThreadPoolTaskExecutor")
+    @Async
     public void tesStAsync() throws InterruptedException {
         Thread.sleep(1000);
     }
