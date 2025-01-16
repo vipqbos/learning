@@ -3,6 +3,7 @@ package com.example.zlv.config;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -10,6 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Configurable
+@EnableAsync
 public class ThreadPoolConfig {
 
     @Value("${thread.core.size:20}")
@@ -22,16 +24,16 @@ public class ThreadPoolConfig {
     private long keepActiveTime;
 
 
-    @Bean(name = "threadPoolExecutor")
-    public ThreadPoolExecutor threadPoolExecutor() {
+    @Bean(name = "testPoolExecutor")
+    public ThreadPoolExecutor testPoolExecutor() {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(threadCoreSize, threadMaxSize, keepActiveTime, TimeUnit.SECONDS, new ArrayBlockingQueue<>(threadCapacitySize));
         threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
         return threadPoolExecutor;
     }
 
 
-    @Bean(name = "threadPoolTaskExecutor")
-    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+    @Bean(name = "testThreadPoolTaskExecutor")
+    public ThreadPoolTaskExecutor testThreadPoolTaskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
         threadPoolTaskExecutor.setCorePoolSize(threadCoreSize);
         threadPoolTaskExecutor.setMaxPoolSize(threadMaxSize);
