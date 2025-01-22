@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE Demo</title>
+</head>
+<body>
+<button type="button" onclick="start()"> 开始</button>
+<button type="button" onclick="stop()"> 关闭</button>
+<div id="result"> is :</div>
+<script>
+    var sseSource;
+   function start(){
+    sseSource  = new EventSource("http://localhost:8080/v1/stream");
+    sseSource.onopen = function () {
+    console.log("连接打开");
+    };
+
+    sseSource.onmessage = function (event) {
+    console.log("接收到数据:", event.data);
+    let div = document.createElement('div');
+    div.innerHTML = event.data;
+    document.getElementById('result').appendChild(div);
+    };
+
+    sseSource.onerror = function (err) {
+    console.log("连接错误:", err);
+    };
+    sseSource.onclose = function(){
+    console.log("连接关闭")
+    }
+   }
+    function stop(){
+    sseSource.close();
+    }
+</script>
+</body>
+</html>

@@ -9,6 +9,10 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/v1")
@@ -19,6 +23,33 @@ public class TestController {
 
     public  TestController(TestService testService){
         this.testService = testService;
+    }
+
+
+
+
+    @GetMapping("/stream")
+    public SseEmitter stream() {
+        System.out.printf("11");
+        SseEmitter sseEmitter = new SseEmitter();
+        new Thread(()->{
+            for (int i = 0; i < 10; i++) {
+
+                try {
+                    sseEmitter.send(SseEmitter.event().name("message").data("Data #" + i));
+                    System.out.println(i);
+                    Thread.sleep(1000);
+
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+            sseEmitter.complete();
+        }).start();
+        return sseEmitter;
     }
 
 
