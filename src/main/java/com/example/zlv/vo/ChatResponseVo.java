@@ -2,8 +2,6 @@ package com.example.zlv.vo;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class ChatResponseVo {
     private String model;
