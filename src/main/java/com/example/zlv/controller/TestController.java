@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/v1")
 @Tag(name = "test参数")
+@Slf4j
 public class TestController {
 
     @Autowired
@@ -51,7 +53,7 @@ public class TestController {
         if (result.getStatusCode() == HttpStatus.OK) {
             byte[] resultRes = result.getBody();
             String body = new String(resultRes,StandardCharsets.UTF_8);
-            System.out.println(body);
+            log.info(body);
             String[] split = body.split("\\n");
             return Arrays.stream(split).map(json -> JSON.parseObject(json, GenerateResponseVo.class)
                     .getResponse()).collect(Collectors.joining());
@@ -64,15 +66,14 @@ public class TestController {
         HttpHeaders httpHeader = new HttpHeaders();
         httpHeader.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
         httpHeader.add(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zhl;q=0.9,en;q=0.8");
-        System.out.print("re:");
-        System.out.println( JSON.toJSONString(chatRequestVo));
+        log.info( JSON.toJSONString(chatRequestVo));
 
         HttpEntity httpEntity = new HttpEntity(JSON.toJSONString(chatRequestVo),httpHeader);
         org.springframework.http.ResponseEntity<byte[]> result = restTemplate.postForEntity(chatUrl, httpEntity, byte[].class);
         if (result.getStatusCode() == HttpStatus.OK) {
             byte[] resultRes = result.getBody();
             String body = new String(resultRes,StandardCharsets.UTF_8);
-            System.out.println(body);
+            log.info(body);
             String[] split = body.split("\\n");
             return Arrays.stream(split).map(json -> JSON.parseObject(json, ChatResponseVo.class).getMessage().getContent()).collect(Collectors.joining());
         }
@@ -92,7 +93,6 @@ public class TestController {
 
                 try {
                     sseEmitter.send(SseEmitter.event().name("message").data("Data #" + i));
-                    System.out.println(i);
                     Thread.sleep(1000);
 
                 } catch (InterruptedException e) {
