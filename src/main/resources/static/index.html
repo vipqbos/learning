@@ -3,14 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <title>SSE Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 70%;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            margin-bottom: 20px;
+        }
+
+        .client {
+            background-color: #e9ecf0;
+            border-radius: 5px;
+        }
+
+        .server {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+         .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 0 1px #e6e6e6;
+        }
+
+        .code-block pre {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        pre code {
+            background-color: #007bff;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+
+        .language-bracket {
+            color: #4a90e2;
+            height: 1.5em;
+            background-color: transparent;
+        }
+    </style>
 </head>
 <body>
 <!--<button type="button" onclick="start()"> 开始</button>-->
 <!--<button type="button" onclick="stop()"> 关闭</button>-->
-
+<div class="chat-container">
+    <div class="chat-message client">
+        欢迎光临！
+    </div>
+    <div class="chat-input">
     输入：
-    <input id="chatMessage" type="text"  name="message" />
-    <input type="button" onclick="chat()"  value="发送"/>
+    <input id="chatMessage" type="text"  name="message" placeholder="告诉我你想说什么吧..."  >
+    <input id="buttonSend" type="button" onclick="chat()"  value="发送" >
+    <br>
+    </div>
+</div>
     <div id="result"> ai助手对话记录 :</div>
 <script>
 <!--    var sseSource;-->
@@ -44,7 +152,7 @@
     function appendDiv(prefix,data) {
     console.log("接收到数据:", data);
     let div = document.createElement('div');
-    div.innerHTML = prefix + data;
+     div.innerHTML =prefix+ `<div class="code-block">${data}</div>`
     document.getElementById('result').appendChild(div);
     }
     function sendChat(message){
@@ -58,8 +166,17 @@
         }
     var msg = JSON.stringify(data)
     xhr.send(msg)
-    appendDiv("<h5>我的问题:</h5> ",message)
+    appendDiv("<strong>我的问题:</strong> ",message)
     }
+
+    var inputChat = document.getElementById("chatMessage")
+    inputChat.addEventListener("keyup",function(event){
+        event.preventDefault();
+        if(event.keyCode ===13){
+            document.getElementById("buttonSend").click();
+        }
+    })
+
     function chat() {
     xhr.open("POST" ,"http://localhost:8080/v1/chat")
     xhr.setRequestHeader("Content-type", "application/json");
@@ -71,9 +188,10 @@
         if(xhr.readyState == 4 && xhr.status ==200){
             var response = xhr.responseText;
             console.log(response)
-            appendDiv("<h5>ai助手回答:</h5> ",response)
+            appendDiv("<strong>ai助手回答:</strong> ",response)
         }
     }
+
 
     }
 

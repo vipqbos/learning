@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>DeepSeek 互动页面</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f5f5f5;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+    }
+
+    h1 {
+        color: #333;
+        text-align: center;
+    }
+
+    .message-box {
+        margin-bottom: 20px;
+    }
+
+    .role {
+        display: inline-block;
+        margin-right: 10px;
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        color: #666;
+    }
+
+    .user-message {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .other-message {
+        background-color: #ff9999;
+        color: white;
+    }
+
+    .input-container {
+        display: flex;
+        gap: 10px;
+        padding: 20px;
+        border-top: 1px solid #ddd;
+    }
+
+    input {
+        flex-grow: 1;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        outline: none;
+    }
+
+    .message-input {
+        width: 100%;
+        padding-right: 20px;
+    }
+
+    button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .message-history {
+        overflow-y: auto;
+        padding-bottom: 10px;
+    }
+
+    .message-item {
+        margin-bottom: 5px;
+        padding: 8px;
+        border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>DeepSeek 智能对话</h1>
+
+  <div class="message-box">
+            <span class="other-message">
+                欢迎使用 DeepSeek！
+            </span>
+    <p>我是 DeepSeek 人工智能助手，很高兴为您服务。</p>
+  </div>
+
+  <div class="input-container">
+    <input type="text" class="message-input" id="chatMessage" placeholder="输入您的问题或指令...">
+    <button id="buttonSend" onclick="sendMessage()">发送</button>
+  </div>
+
+  <div class="message-history" id="result">
+    <!-- 未来的消息将被添加到这里 -->
+  </div>
+</div>
+</body>
+<script>
+      var xhr =   new XMLHttpRequest()
+      function stop(){
+      sseSource.close();
+      }
+
+      function appendDiv(prefix,data) {
+        console.log("接收到数据:", data);
+        let div = document.createElement('div');
+        div.innerHTML =prefix+ `<div class="code-block">${data}</div>`
+        document.getElementById('result').appendChild(div);
+      }
+
+      function sendChat(message){
+        var data = {
+              "model": "deepseek-r1:7b",
+             "messages": [
+             {
+                 "role":"user" ,"content":message
+             }
+              ]
+         }
+        var msg = JSON.stringify(data)
+        xhr.send(msg)
+        appendDiv("<strong>我的问题:</strong> ",message)
+      }
+
+      var inputChat = document.getElementById("chatMessage")
+      inputChat.addEventListener("keyup",function(event){
+          event.preventDefault();
+          if(event.keyCode ===13){
+              document.getElementById("buttonSend").click();
+          }
+      })
+
+      function sendMessage() {
+          xhr.open("POST" ,"http://localhost:8080/v1/chat")
+          xhr.setRequestHeader("Content-type", "application/json");
+          var message =  document.getElementById('chatMessage').value;
+
+          sendChat(message)
+
+          xhr.onreadystatechange  = function () {
+              if(xhr.readyState == 4 && xhr.status ==200){
+                  var response = xhr.responseText;
+                  console.log(response)
+                  appendDiv("<strong>ai助手回答:</strong> ",response)
+              }
+          }
+      }
+
+
+
+</script>
+</html>
