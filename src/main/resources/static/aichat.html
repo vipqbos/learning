@@ -19,6 +19,10 @@
         padding: 20px;
     }
 
+    .visible.{
+    visibility:hidden;
+   }
+
     h1 {
         color: #333;
         text-align: center;
@@ -52,6 +56,13 @@
         gap: 10px;
         padding: 20px;
         border-top: 1px solid #ddd;
+    }
+    .message-container {
+        display: flex;
+        gap: 10px;
+        padding: 20px;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
     }
 
     input {
@@ -93,9 +104,13 @@
         border-radius: 4px;
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+
 </head>
 <body>
+
 <div class="container">
+
   <h1>DeepSeek 智能对话</h1>
 
   <div class="message-box">
@@ -103,43 +118,92 @@
                 欢迎使用 DeepSeek！
             </span>
     <p>我是 DeepSeek 人工智能助手，很高兴为您服务。</p>
+
+  </div>
+  <div class="message-container">
+
+
+    <div class="message-history" >
+      <h5>历史记录</h5>
+      <div id="result" readonly="true"></div>
+      <!-- 未来的消息将被添加到这里 -->
+    </div>
   </div>
 
   <div class="input-container">
     <input type="text" class="message-input" id="chatMessage" placeholder="输入您的问题或指令...">
+    <input type="file" id="imageInput" >
+    <img id="preview" src="" alt="图片预览"  width="50px"  height="50px"  style="visibility:hidden" >
+    <select name="aiType" id="modelType">
+      <option value="deepseek-r1:7b">deepseek(对话大模型)</option>
+      <option value="erwan2/DeepSeek-Janus-Pro-7B">Janus（图片识别大模型）</option>
+    </select>
     <button id="buttonSend" onclick="sendMessage()">发送</button>
   </div>
 
-  <div class="message-history" id="result">
-    <!-- 未来的消息将被添加到这里 -->
-  </div>
+
 </div>
 </body>
-<script>
+<script src="js/npm/marked/marked.min.js"></script>
+<script src="js/npm/marked/lib/marked.umd.js"></script>
+<script src="js/npm/marked-highlight/lib/index.umd.js"></script>
+<script >
+
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    var base64img =null
+
+    imageInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const base64String = e.target.result;
+                    // 将 Base64 编码的图片显示在页面上
+                    preview.src = base64String;
+                    base64img = base64String
+                    console.log('Base64 编码:', base64String);
+                };
+                // 以 DataURL 格式读取文件，即 Base64 编码
+                reader.readAsDataURL(file);
+                preview.style["visibility"]='visible'
+            } else {
+                base64img =null
+            }
+     });
+       // 配置 marked 以支持语法高亮
       var xhr =   new XMLHttpRequest()
       function stop(){
       sseSource.close();
       }
 
       function appendDiv(prefix,data) {
-        console.log("接收到数据:", data);
-        let div = document.createElement('div');
-        div.innerHTML =prefix+ `<div class="code-block">${data}</div>`
-        document.getElementById('result').appendChild(div);
+         console.log("接收到数据:", data);
+         let time = new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+         let markdownText =`${data}`
+         const html = `<pre>${prefix}(${time}):</pre>` + marked.parse(markdownText);
+         const container = document.getElementById('result');
+         container.innerHTML = container.innerHTML + html +'\n';
       }
 
-      function sendChat(message){
+      function sendChat(message,img){
+        var mySelect  = document.getElementById('modelType');
+        var index = mySelect.selectedIndex;
+        var modelType = mySelect.options[index].value
         var data = {
-              "model": "deepseek-r1:7b",
+              "model": modelType,
              "messages": [
              {
-                 "role":"user" ,"content":message
+                 "role":"user" ,
+                 "content":message,
+                 "images":[img]
+
              }
               ]
          }
         var msg = JSON.stringify(data)
         xhr.send(msg)
-        appendDiv("<strong>我的问题:</strong> ",message)
+        appendDiv("我的问题: ",message)
       }
 
       var inputChat = document.getElementById("chatMessage")
@@ -151,22 +215,33 @@
       })
 
       function sendMessage() {
-          xhr.open("POST" ,"http://localhost:8080/v1/chat")
+          xhr.open("POST" ,"http://192.168.3.114:8080/v1/chat")
           xhr.setRequestHeader("Content-type", "application/json");
           var message =  document.getElementById('chatMessage').value;
-
-          sendChat(message)
+          var img = null
+          if(base64img){
+           img = document.getElementById('preview').src
+           const prefixIndex = img.indexOf(',');
+            if (prefixIndex!== -1) {
+                img = img.slice(prefixIndex + 1);
+            }
+          }
+          sendChat(message,img)
 
           xhr.onreadystatechange  = function () {
               if(xhr.readyState == 4 && xhr.status ==200){
                   var response = xhr.responseText;
                   console.log(response)
-                  appendDiv("<strong>ai助手回答:</strong> ",response)
+                  appendDiv("ai助手回答: ",response)
               }
           }
+          base64img =null
+          preview.src =null
+          imageInput.value =null
+          preview.style["visibility"]='hidden'
+          document.getElementById('chatMessage').value=''
+
       }
-
-
 
 </script>
 </html>
