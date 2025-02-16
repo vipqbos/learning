@@ -17,3 +17,12 @@ knife4j:
 
 server:
   port: 8123
+
+ai:
+  ollama:
+    apiHost: "http://localhost.zlv.com:11434"
+  websearch:
+    searxng:
+      url: "http://localhost.zlv.com:8080/search"
+      nums: 10
+      engines: "bing,duckduckgo,brave,mojeek,qwant,semantic_scholar"

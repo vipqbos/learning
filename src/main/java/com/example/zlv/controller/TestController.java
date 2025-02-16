@@ -4,12 +4,21 @@ import com.alibaba.fastjson2.JSON;
 import com.example.zlv.service.TestService;
 import com.example.zlv.vo.*;
 import com.example.zlv.vo.ResponseEntity;
+import io.github.lnyocly.ai4j.platform.openai.chat.entity.ChatCompletion;
+import io.github.lnyocly.ai4j.platform.openai.chat.entity.ChatCompletionResponse;
+import io.github.lnyocly.ai4j.platform.openai.chat.entity.ChatMessage;
+import io.github.lnyocly.ai4j.platform.openai.chat.entity.Choice;
+import io.github.lnyocly.ai4j.service.IChatService;
+import io.github.lnyocly.ai4j.service.PlatformType;
+import io.github.lnyocly.ai4j.service.factor.AiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.service.OpenAPIService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -21,6 +30,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,6 +55,8 @@ public class TestController {
     @Value("${search.url}")
     private String searchUrl;
 
+    @Autowired
+    private AiService aiService;
     @PostMapping("/generate")
     public String generate(@RequestBody GenerateRequestVo chatRequestVo) {
         HttpHeaders httpHeader = new HttpHeaders();
@@ -196,5 +208,23 @@ public class TestController {
         return ResponseEntity.ok(fileResp);
     }
 
+    @SneakyThrows
+    @GetMapping("/getChatMessage")
+    public String getChatMessage(@RequestParam String question) {
+        IChatService chatService = aiService.getChatService(PlatformType.OLLAMA);
+        chatService = aiService.webSearchEnhance(chatService);
+        ChatCompletion chatCompletion = ChatCompletion.builder().model("deepseek-r1:7b").message(ChatMessage.withUser(question)).build();
+        log.info(JSON.toJSONString(chatCompletion));
+        ChatCompletionResponse chatCompletionResponse = chatService.chatCompletion(chatCompletion);
+        List<Choice> choices = chatCompletionResponse.getChoices();
+        Optional<Choice> optionalChoice = choices.stream().findFirst();
+        String content = "为搜索到";
+        if (optionalChoice.isPresent()) {
+            content = choices.stream().findFirst().get().getMessage().getContent();
+            long totalTokens = chatCompletionResponse.getUsage().getTotalTokens();
+            log.info("消耗的tokens :{}",totalTokens);
+        }
+        return content;
+    }
 
 }
