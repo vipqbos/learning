@@ -3,6 +3,7 @@ package com.example.zlv.controller;
 import com.alibaba.fastjson2.JSON;
 import com.example.zlv.service.TestService;
 import com.example.zlv.vo.*;
+import com.example.zlv.vo.ResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -11,10 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -22,6 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,6 +41,9 @@ public class TestController {
 
     @Value("${ollama.chat.url}")
     private String chatUrl;
+
+    @Value("${search.url}")
+    private String searchUrl;
 
     @PostMapping("/generate")
     public String generate(@RequestBody GenerateRequestVo chatRequestVo) {
@@ -106,14 +108,72 @@ public class TestController {
         }).start();
         return sseEmitter;
     }
-
-
     @GetMapping("/ok")
     @Operation(summary = "普通test请求")
-    public String test() throws InterruptedException {
-        testService.tesStAsync();
-        return "OK";
+    public String test(@RequestParam("q") String q)  {
+        String[] split = q.split(",");
+        var search = split[1];
+        String url = searchUrl + "?format=json&q=" + search ;
+        log.info("request:start ：{}", url);
+
+        org.springframework.http.ResponseEntity<SearXNGResponseVo> forEntity = restTemplate.getForEntity(url, SearXNGResponseVo.class);
+        if (forEntity.getStatusCode() == HttpStatus.OK) {
+            log.info("成功");
+            SearXNGResponseVo body = forEntity.getBody();
+            List<SearXNGResponseVo.Result> results = body.getResults();
+            String chatString = toChatString(results);
+            log.info(chatString);
+            return chatString;
+        }
+        log.info("失败");
+        return "你好";
     }
+    @GetMapping("/url")
+    @Operation(summary = "普通test请求")
+    public String getChatUrl(@RequestParam("q") String q)  {
+        String[] split = q.split(",");
+        var search = split[1];
+        String url = searchUrl + "?format=json&q=" + search ;
+        log.info("request:start ：{}", url);
+
+        org.springframework.http.ResponseEntity<SearXNGResponseVo> forEntity = restTemplate.getForEntity(url, SearXNGResponseVo.class);
+        if (forEntity.getStatusCode() == HttpStatus.OK) {
+            log.info("成功");
+            SearXNGResponseVo body = forEntity.getBody();
+            List<SearXNGResponseVo.Result> results = body.getResults();
+            String chatString = toChatUrlString(results);
+            log.info(chatString);
+            return chatString;
+        }
+        log.info("失败");
+        return "你好";
+    }
+
+    private String toChatString(List<SearXNGResponseVo.Result> results  ) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < results.size(); i++) {
+            SearXNGResponseVo.Result result = results.get(i);
+            stringBuilder.append("第").append(i+1).append("消息;\n");
+            stringBuilder.append("消息标题：").append(result.getTitle()).append(";\n");
+            stringBuilder.append("内容：").append(result.getContent()).append(";\n");
+            stringBuilder.append("消息来源").append(result.getUrl()).append(";\n");
+            stringBuilder.append("搜索引擎").append(result.getEngine()).append(";\n");
+        }
+        return stringBuilder.toString();
+    }
+
+   private String toChatUrlString(List<SearXNGResponseVo.Result> results  ) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < results.size(); i++) {
+            SearXNGResponseVo.Result result = results.get(i);
+            stringBuilder.append(result.getUrl()).append(",");
+        }
+        return stringBuilder.toString();
+    }
+
+
 
 
     @Operation(summary = "普通body请求")
