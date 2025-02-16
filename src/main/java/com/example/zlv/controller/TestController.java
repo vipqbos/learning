@@ -218,7 +218,7 @@ public class TestController {
         ChatCompletionResponse chatCompletionResponse = chatService.chatCompletion(chatCompletion);
         List<Choice> choices = chatCompletionResponse.getChoices();
         Optional<Choice> optionalChoice = choices.stream().findFirst();
-        String content = "为搜索到";
+        String content = "未搜索到";
         if (optionalChoice.isPresent()) {
             content = choices.stream().findFirst().get().getMessage().getContent();
             long totalTokens = chatCompletionResponse.getUsage().getTotalTokens();
