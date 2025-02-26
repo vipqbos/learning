@@ -2,8 +2,10 @@ package com.example.zlv.controller;
 
 import com.alibaba.fastjson2.JSON;
 import com.example.zlv.service.TestService;
+import com.example.zlv.sse.listener.MySseListener;
 import com.example.zlv.vo.*;
 import com.example.zlv.vo.ResponseEntity;
+import io.github.lnyocly.ai4j.listener.SseListener;
 import io.github.lnyocly.ai4j.platform.openai.chat.entity.ChatCompletion;
 import io.github.lnyocly.ai4j.platform.openai.chat.entity.ChatCompletionResponse;
 import io.github.lnyocly.ai4j.platform.openai.chat.entity.ChatMessage;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.service.OpenAPIService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -211,6 +214,14 @@ public class TestController {
     @SneakyThrows
     @GetMapping("/getChatMessage")
     public String getChatMessage(@RequestParam String question) {
+        if (StringUtils.isBlank(question)) {
+            return "请输入你想要的问题";
+        }
+        if (StringUtils.startsWith(question,",")) {
+            String[] split = question.split(",");
+            question =split[1];
+        }
+        log.info("request:{}",question);
         IChatService chatService = aiService.getChatService(PlatformType.OLLAMA);
         chatService = aiService.webSearchEnhance(chatService);
         ChatCompletion chatCompletion = ChatCompletion.builder().model("deepseek-r1:7b").message(ChatMessage.withUser(question)).build();
@@ -225,6 +236,32 @@ public class TestController {
             log.info("消耗的tokens :{}",totalTokens);
         }
         return content;
+    }
+
+
+    @SneakyThrows
+    @GetMapping("/getStreamChatMessage")
+    public SseEmitter getStreamChatMessage(@RequestParam String question) {
+        SseEmitter sseEmitter = new SseEmitter();
+        if (StringUtils.isBlank(question)) {
+
+            sseEmitter.send(SseEmitter.event().name("error").data("请输入你想要的问题"));
+            sseEmitter.complete();
+            return sseEmitter;
+        }
+        if (StringUtils.startsWith(question,",")) {
+            String[] split = question.split(",");
+            question =split[1];
+        }
+        log.info("request:{}",question);
+        IChatService chatService = aiService.getChatService(PlatformType.OLLAMA);
+        chatService = aiService.webSearchEnhance(chatService);
+        ChatCompletion chatCompletion = ChatCompletion.builder().model("deepseek-r1:7b").message(ChatMessage.withUser(question)).build();
+        log.info(JSON.toJSONString(chatCompletion));
+
+        SseListener sseListener = new MySseListener(sseEmitter);
+        chatService.chatCompletionStream(chatCompletion,sseListener);
+        return sseEmitter;
     }
 
 }
