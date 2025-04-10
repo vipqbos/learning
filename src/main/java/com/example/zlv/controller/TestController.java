@@ -98,9 +98,6 @@ public class TestController {
     }
 
 
-
-
-
     @GetMapping("/stream")
     public SseEmitter stream() {
         System.out.printf("11");
