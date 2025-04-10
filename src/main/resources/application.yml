@@ -26,3 +26,20 @@ ai:
       url: "http://localhost.zlv.com:8080/search"
       nums: 10
       engines: "bing,duckduckgo,brave,mojeek,qwant,semantic_scholar"
+
+
+spring:
+  application:
+    name: ai
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: deepseek-r1:7b
+#  openai:
+#    base-url: https://dashscop.aliyuncs.com/compatible-mode
+#    api-key: ${OPENAI_API_KEY}
+#    chat:
+#      options:
+#        model: qwen-max # 模型名称
+#        temperature: 0.8 # 模型温度，值越大，输出结果越随机
