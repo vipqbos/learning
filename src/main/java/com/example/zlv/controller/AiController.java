@@ -2,6 +2,7 @@ package com.example.zlv.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,10 @@ public class AiController {
     }
 
     @PostMapping(value = "/chat",produces = "text/html;charset=utf-8")
-    public Flux<String> chatO(String prompt) {
-        return chatClient.prompt().user(prompt).stream().content();
+    public Flux<String> chatO(String prompt,String chatId) {
+        return chatClient.prompt()
+                .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, chatId))
+                .user(prompt)
+                .stream().content();
     }
 }
