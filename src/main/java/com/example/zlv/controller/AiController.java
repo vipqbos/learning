@@ -3,6 +3,7 @@ package com.example.zlv.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -21,6 +22,11 @@ public class AiController {
 
     @GetMapping(value = "/chatFlux",produces = "text/html;charset=utf-8")
     public Flux<String> chatFlux(String prompt) {
+        return chatClient.prompt().user(prompt).stream().content();
+    }
+
+    @PostMapping(value = "/chat",produces = "text/html;charset=utf-8")
+    public Flux<String> chatO(String prompt) {
         return chatClient.prompt().user(prompt).stream().content();
     }
 }
