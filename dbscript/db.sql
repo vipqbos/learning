@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `course_reservation`(
 `school` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '预约校区',
 `remark` text CHARACTER  SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '备注',
 PRIMARY KEY(`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT '校区表';
 
 
 -- 表数据
