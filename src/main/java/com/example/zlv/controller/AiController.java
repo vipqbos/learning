@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/ai")
 public class AiController {
+
     private final ChatClient chatClient;
     private final ChatHistoryRepository chatHistoryRepository;
 
