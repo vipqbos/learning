@@ -1,6 +1,6 @@
 package com.example.zlv.controller;
 
-import com.example.zlv.entity.MessageVO;
+import com.example.zlv.entity.vo.MessageVO;
 import com.example.zlv.repository.ChatHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController

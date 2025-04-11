@@ -1,4 +1,4 @@
-package com.example.zlv.entity;
+package com.example.zlv.entity.vo;
 
 
 import lombok.Data;

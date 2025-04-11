@@ -25,6 +25,7 @@ public class OllamaConfig {
     public ChatMemory chatMemory() {
         return new InMemoryChatMemory();
     }
+
     @Bean
     public ChatClient gameChatClient(OpenAiChatModel model,ChatMemory chatMemory) {
         return ChatClient.builder(model)
@@ -32,5 +33,6 @@ public class OllamaConfig {
                 .defaultAdvisors(new SimpleLoggerAdvisor(), new MessageChatMemoryAdvisor(chatMemory))
                 .build();
     }
+
 
 }
