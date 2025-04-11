@@ -1,5 +1,6 @@
 package com.example.zlv.controller;
 
+import com.example.zlv.repository.ChatHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/ai")
 public class AiController {
     private final ChatClient chatClient;
+    private final ChatHistoryRepository chatHistoryRepository;
 
     @GetMapping("/chat")
     public String chat(String prompt){
@@ -27,7 +29,10 @@ public class AiController {
     }
 
     @PostMapping(value = "/chat",produces = "text/html;charset=utf-8")
-    public Flux<String> chatO(String prompt,String chatId) {
+    public Flux<String> chat(String prompt,String chatId) {
+        // 1.保存会话
+        chatHistoryRepository.save("chat", chatId);
+        // 2.请求模型
         return chatClient.prompt()
                 .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, chatId))
                 .user(prompt)
