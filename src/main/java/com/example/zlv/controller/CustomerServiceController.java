@@ -25,12 +25,5 @@ public class CustomerServiceController {
                 .user(prompt)
                 .call().content();
     }
-    private final CourseReservationService courseReservationService;
-    @RequestMapping("/init")
-    public String init() {
-        CourseReservation courseReservation = CourseReservation.builder().course("课程").contactInfo("1312").school("学校").studentName("赵四").remark("备注").build();
 
-        courseReservationService.save(courseReservation);
-        return "ok";
-    }
 }
