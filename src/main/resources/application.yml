@@ -31,6 +31,9 @@ ai:
 spring:
   application:
     name: ai
+  data:
+    redis:
+      host: localhost.zlv.com:6379
   ai:
     ollama:
       base-url: http://localhost:11434
@@ -52,6 +55,11 @@ spring:
     url: jdbc:mysql://localhost.zlv.com:5455/itheima?serverTimezone=Asia/Shanghai
     username: aiuser
     password: aitest
+  vectorstore:
+    redis:
+      index: spring_ai_index # 向量库索引名
+      initialize-schema: true # 是否初始化向量库索引结构
+      prefix: "doc:" # 向量库key前缀
 logging:
   level:
     org.springframework.ai.chat.client.advisor: debug
