@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class CourseQuery {
-    @ToolParam(required = false, description = "课程类型：编程、设计、自媒体、其它")
+    @ToolParam(required = false, description = "课程类型：编程、设计、自媒体、其它、直播")
     private String type;
     @ToolParam(required = false, description = "学历要求：0-无、1-初中、2-高中、3-大专、4-本科及本科以上")
     private Integer edu;

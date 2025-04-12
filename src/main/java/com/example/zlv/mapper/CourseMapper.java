@@ -1,7 +1,7 @@
 package com.example.zlv.mapper;
 
-import com.example.zlv.entity.pojo.Course;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.zlv.entity.pojo.Course;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

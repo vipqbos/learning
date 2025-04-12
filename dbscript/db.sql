@@ -31,11 +31,11 @@ VALUES
 DROP TABLE IF EXISTS `course_reservation`;
 CREATE TABLE IF NOT EXISTS `course_reservation`(
 `id` int NOT NULL AUTO_INCREMENT,
-`course` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '预约课程',
+`course` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL  COMMENT '预约课程',
 `student_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '学生姓名',
 `contact_info`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '联系方式',
 `school` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '预约校区',
-`remark` text CHARACTER  SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '备注',
+`remark` text CHARACTER  SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '备注',
 PRIMARY KEY(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT '校区表';
 

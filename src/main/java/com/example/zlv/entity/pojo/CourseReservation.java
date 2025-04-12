@@ -3,10 +3,7 @@ package com.example.zlv.entity.pojo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -22,8 +19,10 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
+@Builder
+@AllArgsConstructor
 @TableName("course_reservation")
-public class CourseReservation extends Model<CourseReservation> implements Serializable {
+public class CourseReservation  implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
