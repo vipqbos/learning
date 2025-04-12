@@ -17,13 +17,13 @@ public class CustomerServiceController {
     private final ChatClient serviceChatClient;
     private final ChatHistoryRepository chatHistoryRepository;
     @RequestMapping(value = "/service",produces = "text/html;charset=utf-8")
-    public String  service(String prompt, String chatId) {
+    public Flux<String>  service(String prompt, String chatId) {
 
         chatHistoryRepository.save("service", chatId);
         return serviceChatClient.prompt()
                 .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, chatId))
                 .user(prompt)
-                .call().content();
+                .stream().content();
     }
 
 }
