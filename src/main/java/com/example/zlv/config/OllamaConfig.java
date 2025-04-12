@@ -48,14 +48,14 @@ public class OllamaConfig {
     }
 
     @Bean
-    public ChatClient gameChatClient(AlibabaOpenAiChatModel model,ChatMemory chatMemory) {
+    public ChatClient gameChatClient(OpenAiChatModel model,ChatMemory chatMemory) {
         return ChatClient.builder(model)
                 .defaultSystem(SystemConstants.GAME_SYSTEM_PROMPT)
                 .defaultAdvisors(new SimpleLoggerAdvisor(), new MessageChatMemoryAdvisor(chatMemory))
                 .build();
     }
     @Bean
-    public ChatClient serviceChatClient(OpenAiChatModel model, ChatMemory chatMemory, CourseTools courseTools) {
+    public ChatClient serviceChatClient(AlibabaOpenAiChatModel model, ChatMemory chatMemory, CourseTools courseTools) {
         return ChatClient.builder(model)
                 .defaultSystem(SystemConstants.SERVICE_SYSTEM_PROMPT)
                 .defaultAdvisors(new SimpleLoggerAdvisor(), new MessageChatMemoryAdvisor(chatMemory))
