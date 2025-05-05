@@ -3,6 +3,7 @@ package com.example.zlv.config;
 import com.example.zlv.constants.SystemConstants;
 import com.example.zlv.model.AlibabaOpenAiChatModel;
 import com.example.zlv.tools.CourseTools;
+import com.example.zlv.tools.ZobTools;
 import io.micrometer.observation.ObservationRegistry;
 import org.springframework.ai.autoconfigure.openai.OpenAiChatProperties;
 import org.springframework.ai.autoconfigure.openai.OpenAiConnectionProperties;
@@ -13,6 +14,7 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.observation.ChatModelObservationConvention;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.model.SimpleApiKey;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -40,8 +42,9 @@ import java.util.Objects;
 @Configuration
 public class OllamaConfig {
     @Bean
-    public ChatClient chatClient(OllamaChatModel model,ChatMemory chatMemory) {
+    public ChatClient chatClient(AlibabaOpenAiChatModel model,ChatMemory chatMemory) {
         return ChatClient.builder(model)
+                .defaultOptions(ChatOptions.builder().model("qwen-omni-turbo").build())
                 .defaultSystem("你是一个热心、可爱的智能助手，你的名字叫小团团，请一小团团的身份和语气回答问题。")
                 .defaultAdvisors(new SimpleLoggerAdvisor(),new MessageChatMemoryAdvisor(chatMemory))
                 .build();
@@ -65,6 +68,15 @@ public class OllamaConfig {
                 .defaultSystem(SystemConstants.SERVICE_SYSTEM_PROMPT)
                 .defaultAdvisors(new SimpleLoggerAdvisor(), new MessageChatMemoryAdvisor(chatMemory))
                 .defaultTools(courseTools)
+                .build();
+    }
+
+    @Bean
+    public ChatClient ue5ChatClient(AlibabaOpenAiChatModel model, ChatMemory chatMemory, ZobTools zobTools) {
+        return ChatClient.builder(model)
+                .defaultSystem(SystemConstants.UE5_AI_SYSTEM_PROMPT)
+                .defaultAdvisors(new SimpleLoggerAdvisor(), new MessageChatMemoryAdvisor(chatMemory))
+                .defaultTools(zobTools)
                 .build();
     }
 
